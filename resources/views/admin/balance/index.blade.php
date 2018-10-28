@@ -17,12 +17,16 @@
       <a href="{{route('balance.deposit')}}" class="btn btn-primary">
         <i class="fa fa-cart-plus"></i> Recarregar
       </a>
-      <a href="" class="btn btn-danger">
-        <i class="fa fa-cart-arrow-down"></i> Sacar
-      </a>
+      @if ($amount > 0)
+        <a href={{route('balance.withdraw')}} class="btn btn-danger">
+          <i class="fa fa-cart-arrow-down"></i> Sacar
+        </a>
+      @endif
     </div>
 
     <div class="box-body">
+      @include('admin.includes.alerts')
+
       <div class="small-box bg-green">
         <div class="inner">
           <h3>R$ {{ number_format($amount, 2, ',', '') }}</h3>
