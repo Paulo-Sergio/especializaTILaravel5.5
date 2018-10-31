@@ -102,4 +102,12 @@ class BalanceController extends Controller
             ->route('balance.transfer')
             ->with('error', $response['message']);
     }
+
+    public function historic()
+    {
+        // historic do user que esta logado
+        $historics = auth()->user()->historics()->get();
+
+        return view('admin.balance.historics', compact('historics'));
+    }
 }
