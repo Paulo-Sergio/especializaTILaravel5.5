@@ -5,11 +5,14 @@ namespace App\Http\Controllers\Admin;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Balance;
+use App\Models\Historic;
 use App\User;
 use App\Http\Requests\MoneyValidationFormRequest;
 
 class BalanceController extends Controller
 {
+    private $totalPage = 2;
+
     public function index()
     {
         $balance = auth()->user()->balance;
@@ -103,11 +106,19 @@ class BalanceController extends Controller
             ->with('error', $response['message']);
     }
 
-    public function historic()
+    public function historic(Historic $historic)
     {
         // historic do user que esta logado
-        $historics = auth()->user()->historics()->get();
+        // with(['user']), na consulta vem a relação com user
+        $historics = auth()->user()->historics()->with(['userSender'])->paginate($this->totalPage);
 
-        return view('admin.balance.historics', compact('historics'));
+        $types = $historic->type();
+
+        return view('admin.balance.historics', compact('historics', 'types'));
+    }
+
+    public function searchHistoric(Request $request)
+    {
+        dd($request->all());
     }
 }
