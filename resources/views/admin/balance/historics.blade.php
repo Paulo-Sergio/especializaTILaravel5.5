@@ -63,7 +63,11 @@
         </tbody>
       </table>
 
-      {!! $historics->links() !!}
+      @if (isset($dataForm))
+        {!! $historics->appends($dataForm)->links() !!}
+      @else
+        {!! $historics->links() !!}
+      @endif
 
     </div>
   </div>
