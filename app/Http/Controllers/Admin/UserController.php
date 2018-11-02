@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
+use App\Http\Requests\UpdateProfileFormRequest;
 use App\Http\Controllers\Controller;
 
 class UserController extends Controller
@@ -12,8 +13,9 @@ class UserController extends Controller
         return view('site.profile.profile');
     }
 
-    public function profileUpdate(Request $request)
+    public function profileUpdate(UpdateProfileFormRequest $request)
     {
+        $user = auth()->user();
         $data = $request->all();
 
         if ($data['password'] != null)
@@ -21,7 +23,26 @@ class UserController extends Controller
         else
             unset($data['password']);
 
-        $update = auth()->user()->update($data);
+        $data['image'] = $user->image; // caso já axista a imagem cadastrada, ficara com mesmo nome
+        if ($request->hasFile('image') && $request->file('image')->isValid()) {
+            if ($user->image)
+                $name = $user->image;
+            else
+                $name = $user->id . kebab_case($user->name);
+
+            $extension = $request->image->extension();
+            $nameFinal = $name . "." . $extension;
+
+            $data['image'] = $nameFinal;
+            $upload = $request->image->storeAs('users', $nameFinal);
+
+            if (!$upload)
+                return redirect()
+                    ->back()
+                    ->with('error', 'Falha ao fazer upload da imagem');
+        }
+        
+        $update = $user->update($data);
 
         if ($update)
             return redirect()
